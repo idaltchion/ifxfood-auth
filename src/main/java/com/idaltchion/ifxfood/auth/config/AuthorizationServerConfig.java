@@ -24,10 +24,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
 			.withClient("ifxfood-web")
-			.secret(passwordEncoder.encode("12345"))
-			.authorizedGrantTypes("password")
-			.scopes("read", "write")
-			.accessTokenValiditySeconds(60 * 60 * 1);
+				.secret(passwordEncoder.encode("12345"))
+				.authorizedGrantTypes("password")
+				.scopes("read", "write")
+				.accessTokenValiditySeconds(60 * 60 * 1)
+		.and()
+			/* esse client tem a funcao de somente validar o token pelo resource server (/check_token) */
+			.withClient("resource-server-client") 
+				.secret(passwordEncoder.encode("54321"));
+			
 	}
 	
 	/* método necessario somente quando o grant type for do tipo "password" */
@@ -38,6 +43,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+//		security.checkTokenAccess("permitAll()");
 		security.checkTokenAccess("isAuthenticated()");
 	}
 	
