@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
 @Configuration
 @EnableAuthorizationServer
@@ -29,6 +30,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private JwtKeyStoreProperties jwtProperties;
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -87,6 +91,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 //		security.checkTokenAccess("permitAll()");
 		security.checkTokenAccess("isAuthenticated()");
+		security.tokenKeyAccess("permitAll()");
 	}
 	
 	private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
@@ -102,10 +107,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Bean
 	public JwtAccessTokenConverter jwtAccessTokenConverter() {
-		/* The secret length must be at least 256 bits */
-		var key = "12345678901234567890123456789012";
-		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-		jwtAccessTokenConverter.setSigningKey(key);
+		var jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		var jksResource = jwtProperties.getResourcePath();
+		var keyStorePass = jwtProperties.getKeyStorePassword();
+		var keyPaiAlias = jwtProperties.getKeyAlias();
+		var keyStoreFactory = new KeyStoreKeyFactory(jksResource, keyStorePass.toCharArray());
+		var keyPair = keyStoreFactory.getKeyPair(keyPaiAlias);
+		jwtAccessTokenConverter.setKeyPair(keyPair);
+		
 		return jwtAccessTokenConverter;
 	}
 	

@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "ifxfood.jks.resource.path",
+    "type": "java.lang.String",
+    "description": "A description for 'ifxfood.jks.resource.path'"
+  },
+  {
+    "name": "ifxfood.jks.key.store.password",
+    "type": "java.lang.String",
+    "description": "A description for 'ifxfood.jks.key.store.password'"
+  },
+  {
+    "name": "ifxfood.jks.key.alias",
+    "type": "java.lang.String",
+    "description": "A description for 'ifxfood.jks.key.alias'"
+  }
+]}
